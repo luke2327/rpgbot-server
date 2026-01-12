@@ -81,7 +81,7 @@ export class AppService {
     <body>
       <div class="container">
         <img src="https://api-frameworks.vercel.sh/framework-logos/nestjs.svg" alt="Nitro logo" class="logo" />
-        <h1>Welcome to NestJS</h1>
+        <h1>알피지봇 서버</h1>
         <p>A progressive Node.js framework running on Vercel</p>
         <div class="features">
           <div class="feature">
@@ -95,5 +95,36 @@ export class AppService {
     </body>
     </html>
     `;
+  }
+
+  getTest(someValue: any): any {
+    console.log(someValue);
+    return {
+      version: '2.0',
+      template: {
+        outputs: [
+          {
+            textCard: {
+              title: '알피지봇 고객센터입니다',
+              description: '알피지봇 고객센터입니다. 무엇을 도와드릴까요?',
+              buttons: [
+                {
+                  action: 'webLink',
+                  label: '고객센터 바로가기',
+                  webLinkUrl:
+                    'https://i.namu.wiki/i/TsFafjblDnyTKCExv44F2IfPLUwL6eWtvEEe-CAhCHim9xV9m497hhAa8EOf_lbM44wFyCEKrkGdEC_pYM7-Mg.webp',
+                },
+                {
+                  action: 'webLink',
+                  label: '밥먹으러 가기',
+                  webLinkUrl:
+                    'https://i.namu.wiki/i/TsFafjblDnyTKCExv44F2IfPLUwL6eWtvEEe-CAhCHim9xV9m497hhAa8EOf_lbM44wFyCEKrkGdEC_pYM7-Mg.webp',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    };
   }
 }
