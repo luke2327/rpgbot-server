@@ -16,6 +16,11 @@ export class AppController {
     return this.appService.getTest(someValue);
   }
 
+  @Post('/join-user')
+  postJoinUser() {
+    return this.appService.postJoinUser();
+  }
+
   @Get('/health')
   getHealth(): string {
     return 'OK';

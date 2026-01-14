@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { WebClient } from '@slack/web-api';
 
 @Injectable()
 export class AppService {
@@ -126,5 +127,30 @@ export class AppService {
         ],
       },
     };
+  }
+
+  async postJoinUser() {
+    const token = process.env.SLACK_TOKEN;
+    console.log('TOKEN ::', token);
+    const web = new WebClient(token);
+
+    const result = await web.chat.postMessage({
+      channel: 'C0A8YGXA7FB',
+      blocks: [
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'plain_text',
+              text: 'ss',
+            },
+          ],
+        },
+      ],
+    });
+
+    console.log(
+      `Successfully send message ${result.ts} in conversation T0A8YGX24FK`,
+    );
   }
 }
