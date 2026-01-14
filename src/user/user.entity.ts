@@ -1,4 +1,4 @@
-import { uuidTransformer } from '@/libs/utils'
+import { uuidTransformer } from '../libs/utils'
 import { Entity, Column, PrimaryColumn } from 'typeorm'
 
 @Entity('user')

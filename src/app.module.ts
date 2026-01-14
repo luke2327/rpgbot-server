@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { AppController } from '@/app.controller'
-import { AppService } from '@/app.service'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { env } from '@/configs/env'
-import { UserEntity } from '@/user/user.entity'
+import { env } from './configs/env'
+import { UserEntity } from './user/user.entity'
 import { UserModule } from './user/user.module'
 
 @Module({

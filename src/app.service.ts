@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { WebClient } from '@slack/web-api'
-import { JoinUserDTO } from '@/dtos/joinUserDto'
-import { env } from '@/configs/env'
+import { JoinUserDTO } from './dtos/joinUserDto'
+import { env } from './configs/env'
 
 @Injectable()
 export class AppService {
