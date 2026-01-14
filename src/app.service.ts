@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { WebClient } from '@slack/web-api';
-import { JoinUserDTO } from './dtos/joinUserDto';
+import { Injectable } from '@nestjs/common'
+import { WebClient } from '@slack/web-api'
+import { JoinUserDTO } from '@/dtos/joinUserDto'
+import { env } from '@/configs/env'
 
 @Injectable()
 export class AppService {
@@ -96,11 +97,11 @@ export class AppService {
       </div>
     </body>
     </html>
-    `;
+    `
   }
 
   getTest(someValue: any): any {
-    console.log(someValue);
+    console.log(someValue)
     return {
       version: '2.0',
       template: {
@@ -127,17 +128,16 @@ export class AppService {
           },
         ],
       },
-    };
+    }
   }
 
   async postJoinUser(joinUserDTO: JoinUserDTO) {
-    const token = process.env.SLACK_TOKEN;
-    const web = new WebClient(token);
+    const web = new WebClient(env.SLACK_TOKEN)
 
     const testObj = {
       test: 1,
       value: 2,
-    };
+    }
 
     const result = await web.chat.postMessage({
       channel: joinUserDTO.channel,
@@ -157,10 +157,10 @@ export class AppService {
           },
         },
       ],
-    });
+    })
 
     console.log(
       `Successfully send message ${result.ts} in conversation T0A8YGX24FK`,
-    );
+    )
   }
 }
