@@ -1,5 +1,6 @@
-import { Controller, Get, Header, Post } from '@nestjs/common';
+import { Body, Controller, Get, Header, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import { JoinUserDTO } from './dtos/joinUserDto';
 
 @Controller()
 export class AppController {
@@ -17,8 +18,8 @@ export class AppController {
   }
 
   @Post('/join-user')
-  postJoinUser() {
-    return this.appService.postJoinUser();
+  postJoinUser(@Body() joinUserDTO: JoinUserDTO) {
+    return this.appService.postJoinUser(joinUserDTO);
   }
 
   @Get('/health')

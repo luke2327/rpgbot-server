@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
+import { slackChannel } from './constants/slack-channel';
+import { JoinUserDTO } from './dtos/joinUserDto';
 
 @Injectable()
 export class AppService {
@@ -129,22 +131,31 @@ export class AppService {
     };
   }
 
-  async postJoinUser() {
+  async postJoinUser(joinUserDTO: JoinUserDTO) {
     const token = process.env.SLACK_TOKEN;
-    console.log('TOKEN ::', token);
     const web = new WebClient(token);
 
+    const testObj = {
+      test: 1,
+      value: 2,
+    };
+
     const result = await web.chat.postMessage({
-      channel: 'C0A8YGXA7FB',
+      channel: slackChannel.botTest,
       blocks: [
         {
-          type: 'context',
-          elements: [
-            {
-              type: 'plain_text',
-              text: 'ss',
-            },
-          ],
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: '신규유저가입',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            text: `\`\`\`${JSON.stringify(joinUserDTO || testObj, null, 2)}\`\`\``,
+            type: 'mrkdwn',
+          },
         },
       ],
     });
