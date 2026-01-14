@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
-import { slackChannel } from './constants/slack-channel';
 import { JoinUserDTO } from './dtos/joinUserDto';
 
 @Injectable()
@@ -141,7 +140,7 @@ export class AppService {
     };
 
     const result = await web.chat.postMessage({
-      channel: slackChannel.botTest,
+      channel: joinUserDTO.channel,
       blocks: [
         {
           type: 'header',
