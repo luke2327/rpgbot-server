@@ -223,28 +223,26 @@ export class AppService {
   }
 
   async saveJob(body: unknown) {
+    // body를 안전하게 타입 단언 (any 경고 해결)
     const payload = body as {
-      userRequest?: {
-        user?: {
-          id: string
-        }
-      }
       params?: {
         job?: string
       }
     }
 
-    const userId = payload?.userRequest?.user?.id
-    const job = payload?.params?.job // 챗봇에서 보낸 job 값
+    // job 값만 추출 (챗봇에서 보낸 파라미터)
+    const job = payload?.params?.job
 
-    if (!userId || !job) {
-      return kakaoTemplate.simpleText('데이터를 가져오지 못했습니다.')
+    if (!job) {
+      return kakaoTemplate.simpleText('직업 정보를 가져오지 못했습니다.')
     }
+
     const connection = await pool.getConnection()
     try {
+      // DB에 job만 저장 (user_id 없이 임시로 저장, 테스트용)
       await connection.query(
-        'INSERT INTO characters (user_id, job) VALUES (UNHEX(?), ?) ON DUPLICATE KEY UPDATE job = ?',
-        [userId.replace(/-/g, ''), job, job],
+        'INSERT INTO characters (job) VALUES (?) ON DUPLICATE KEY UPDATE job = ?',
+        [job, job],
       )
 
       return kakaoTemplate.simpleText(`직업이 ${job}으로 저장됐습니다!`)
