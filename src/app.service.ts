@@ -223,39 +223,48 @@ export class AppService {
   }
 
   async saveJob(body: unknown) {
-    // body를 안전하게 타입 단언 (any 경고 해결)
+    // body를 안전하게 타입 단언 (action.params.job 접근 에러 해결)
     const payload = body as {
-      userRequest?: {
-        user?: {
-          id: string
-        }
-      }
       action?: {
-        // ← 여기 추가!
         params?: {
           job?: string
         }
       }
     }
 
-    // job 값만 추출 (챗봇에서 보낸 파라미터)
+    // job 값 추출
     const job = payload?.action?.params?.job
 
     if (!job) {
       return kakaoTemplate.simpleText('직업 정보를 가져오지 못했습니다.')
     }
 
-    const connection = await pool.getConnection()
+    const connection = await pool.getConnection().catch((err) => {
+      console.error('DB 연결 실패:', err)
+      return null
+    })
+
+    if (!connection) {
+      return kakaoTemplate.simpleText(
+        '서버 연결 오류입니다. 다시 시도해주세요.',
+      )
+    }
+
     try {
-      // DB에 job만 저장 (user_id 없이 임시로 저장, 테스트용)
+      // 임의의 userId 숫자 (테스트용: 999999)
+      const testUserId = '4A335D1EF0D210EA6ABB20995EEAFA3D' // ← 여기서 임의 숫자 고정 (실제로는 32자리 hex)
+
+      // DB에 job + 임의 userId 저장
       await connection.query(
-        'INSERT INTO characters (job) VALUES (?) ON DUPLICATE KEY UPDATE job = ?',
-        [job, job],
+        'INSERT INTO characters (user_id, job) VALUES (?, ?) ON DUPLICATE KEY UPDATE job = ?',
+        [testUserId, job, job],
       )
 
-      return kakaoTemplate.simpleText(`직업이 ${job}으로 저장됐습니다!`)
+      return kakaoTemplate.simpleText(
+        `직업이 ${job}으로 저장됐습니다! (테스트 userId: ${testUserId})`,
+      )
     } catch (error) {
-      console.error('DB 에러:', error)
+      console.error('DB 저장 에러:', error)
       return kakaoTemplate.simpleText('저장 실패! 다시 시도해주세요.')
     } finally {
       connection.release()
