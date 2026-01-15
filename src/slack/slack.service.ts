@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { WebClient } from '@slack/web-api'
-import { env } from '@/configs/env'
+import { env } from 'src/configs/env'
 
 @Injectable()
 export class SlackService {
