@@ -104,6 +104,12 @@ export class AppService {
   getTest(): any {
     return kakaoTemplate.simpleText('테스트 텍스트')
   }
+  
+  showMyId(userId: string) {
+    return kakaoTemplate.simpleText(`너의 카카오톡 고유 ID는:\n${userId}`);
+  }
+
+  
 
   async postJoinUser(joinUserDTO: JoinUserDTO) {
     const web = new WebClient(env.SLACK_TOKEN)
