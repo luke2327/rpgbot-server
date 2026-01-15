@@ -41,4 +41,9 @@ export class AppController {
   async joinUser(@Body() body: any) {
     return this.appService.joinUser(body)
   }
+
+  @Post('/save-job')
+  async saveJob(@Body() body: any) {
+    return this.appService.saveJob(body)
+  }
 }

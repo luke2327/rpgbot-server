@@ -190,7 +190,6 @@ export class AppService {
       }
     }
 
-    // 유저 ID 추출
     const userId = payload?.userRequest?.user?.id
 
     if (!userId) {
@@ -218,6 +217,40 @@ export class AppService {
       return kakaoTemplate.simpleText(
         '가입 중 오류가 발생했습니다. 다시 시도해주세요.',
       )
+    } finally {
+      connection.release()
+    }
+  }
+
+  async saveJob(body: unknown) {
+    const payload = body as {
+      userRequest?: {
+        user?: {
+          id: string
+        }
+      }
+      params?: {
+        job?: string
+      }
+    }
+
+    const userId = payload?.userRequest?.user?.id
+    const job = payload?.params?.job // 챗봇에서 보낸 job 값
+
+    if (!userId || !job) {
+      return kakaoTemplate.simpleText('데이터를 가져오지 못했습니다.')
+    }
+    const connection = await pool.getConnection()
+    try {
+      await connection.query(
+        'INSERT INTO characters (user_id, job) VALUES (UNHEX(?), ?) ON DUPLICATE KEY UPDATE job = ?',
+        [userId.replace(/-/g, ''), job, job],
+      )
+
+      return kakaoTemplate.simpleText(`직업이 ${job}으로 저장됐습니다!`)
+    } catch (error) {
+      console.error('DB 에러:', error)
+      return kakaoTemplate.simpleText('저장 실패! 다시 시도해주세요.')
     } finally {
       connection.release()
     }
