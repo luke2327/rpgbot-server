@@ -225,13 +225,21 @@ export class AppService {
   async saveJob(body: unknown) {
     // body를 안전하게 타입 단언 (any 경고 해결)
     const payload = body as {
-      params?: {
-        job?: string
+      userRequest?: {
+        user?: {
+          id: string
+        }
+      }
+      action?: {
+        // ← 여기 추가!
+        params?: {
+          job?: string
+        }
       }
     }
 
     // job 값만 추출 (챗봇에서 보낸 파라미터)
-    const job = payload?.params?.job
+    const job = payload?.action?.params?.job
 
     if (!job) {
       return kakaoTemplate.simpleText('직업 정보를 가져오지 못했습니다.')
