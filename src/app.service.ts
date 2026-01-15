@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { WebClient } from '@slack/web-api'
 import { JoinUserDTO } from './dtos/joinUserDto'
 import { env } from './configs/env'
+import { kakaoTemplate } from './libs/kakao.utils'
 
 @Injectable()
 export class AppService {
@@ -100,35 +101,8 @@ export class AppService {
     `
   }
 
-  getTest(someValue: any): any {
-    console.log(someValue)
-    return {
-      version: '2.0',
-      template: {
-        outputs: [
-          {
-            textCard: {
-              title: '알피지봇 고객센터입니다',
-              description: '알피지봇 고객센터입니다. 무엇을 도와드릴까요?',
-              buttons: [
-                {
-                  action: 'webLink',
-                  label: '고객센터 바로가기',
-                  webLinkUrl:
-                    'https://i.namu.wiki/i/TsFafjblDnyTKCExv44F2IfPLUwL6eWtvEEe-CAhCHim9xV9m497hhAa8EOf_lbM44wFyCEKrkGdEC_pYM7-Mg.webp',
-                },
-                {
-                  action: 'webLink',
-                  label: '밥먹으러 가기',
-                  webLinkUrl:
-                    'https://i.namu.wiki/i/TsFafjblDnyTKCExv44F2IfPLUwL6eWtvEEe-CAhCHim9xV9m497hhAa8EOf_lbM44wFyCEKrkGdEC_pYM7-Mg.webp',
-                },
-              ],
-            },
-          },
-        ],
-      },
-    }
+  getTest(): any {
+    return kakaoTemplate.simpleText('테스트 텍스트')
   }
 
   async postJoinUser(joinUserDTO: JoinUserDTO) {

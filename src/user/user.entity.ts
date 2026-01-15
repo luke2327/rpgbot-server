@@ -1,8 +1,5 @@
-import { CharacterEntity } from './character.entity'
 import { uuidTransformer } from '../libs/utils'
-import { Entity, Column, PrimaryColumn, OneToOne } from 'typeorm'
-
-
+import { Entity, Column, PrimaryColumn } from 'typeorm'
 
 @Entity('user')
 export class UserEntity {
@@ -29,7 +26,5 @@ export class UserEntity {
     nullable: false,
     default: 'CURRENT_TIMESTAMP',
   })
-  createdAt: Date   
-
-  
+  createdAt: Date
 }
