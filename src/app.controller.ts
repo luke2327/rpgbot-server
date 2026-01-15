@@ -36,4 +36,9 @@ export class AppController {
   postShowMyId(@Body() body: unknown) {
     return this.appService.postShowMyId(body)
   }
+
+  @Post('/join')
+  async joinUser(@Body() body: any) {
+    return this.appService.joinUser(body)
+  }
 }

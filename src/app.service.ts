@@ -5,6 +5,18 @@ import { env } from './configs/env'
 import { kakaoTemplate } from './libs/kakao.utils'
 import { SlackService } from './slack/slack.service'
 import { slackChannel } from './constants/slack-channel'
+import mysql from 'mysql2/promise'
+
+const pool = mysql.createPool({
+  host: env.DB_HOST,
+  port: env.DB_PORT,
+  user: env.DB_USER,
+  password: env.DB_PASSWORD,
+  database: env.DB_NAME,
+  connectionLimit: 10, // 최대 연결 수
+  waitForConnections: true,
+  queueLimit: 0,
+})
 
 @Injectable()
 export class AppService {
@@ -166,5 +178,48 @@ export class AppService {
     console.log(
       `Successfully send message ${result.ts} in conversation T0A8YGX24FK`,
     )
+  }
+
+  async joinUser(body: unknown) {
+    // body를 안전하게 타입 단언 (any 경고 해결)
+    const payload = body as {
+      userRequest?: {
+        user?: {
+          id: string
+        }
+      }
+    }
+
+    // 유저 ID 추출
+    const userId = payload?.userRequest?.user?.id
+
+    if (!userId) {
+      return kakaoTemplate.simpleText(
+        '유저 ID를 가져오지 못했습니다. 다시 시도해주세요.',
+      )
+    }
+
+    const connection = await pool.getConnection()
+    try {
+      // DB에 저장 (중복이면 무시)
+      await connection.query(
+        'INSERT IGNORE INTO `user` (user_id, created_at) VALUES (UNHEX(?), NOW())',
+        [userId.replace(/-/g, '')], // 하이픈 제거해서 32자리 hex로 변환
+      )
+
+      // simpleText로 간단히 응답
+      return kakaoTemplate.simpleText(
+        `가입 완료!\n` +
+          `너의 카카오톡 고유 ID: ${userId}\n` +
+          `이제 모험을 시작할 수 있어요!`,
+      )
+    } catch (error) {
+      console.error('DB 저장 에러:', error)
+      return kakaoTemplate.simpleText(
+        '가입 중 오류가 발생했습니다. 다시 시도해주세요.',
+      )
+    } finally {
+      connection.release()
+    }
   }
 }
