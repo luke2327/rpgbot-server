@@ -31,10 +31,9 @@ export class AppController {
   getVersion(): string {
     return '1.0.0'
   }
-  
-  @Post('/my-id')
-  showMyId(@Body() body: any) {
-  const userId = body.userRequest?.user?.id || 'ID 없음';
-  return this.appService.showMyId(userId);
+
+  @Post('/show-my-id')
+  postShowMyId(@Body() body: unknown) {
+    return this.appService.postShowMyId(body)
   }
 }

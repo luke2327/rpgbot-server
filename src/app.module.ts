@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { env } from './configs/env'
 import { UserEntity } from './user/user.entity'
 import { UserModule } from './user/user.module'
+import { SlackService } from './slack/slack.service'
 
 @Module({
   imports: [
@@ -26,6 +27,6 @@ import { UserModule } from './user/user.module'
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SlackService],
 })
 export class AppModule {}

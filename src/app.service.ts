@@ -3,9 +3,13 @@ import { WebClient } from '@slack/web-api'
 import { JoinUserDTO } from './dtos/joinUserDto'
 import { env } from './configs/env'
 import { kakaoTemplate } from './libs/kakao.utils'
+import { SlackService } from './slack/slack.service'
+import { slackChannel } from './constants/slack-channel'
 
 @Injectable()
 export class AppService {
+  constructor(private readonly slackService: SlackService) {}
+
   getHello(): string {
     return `
     <!DOCTYPE html>
@@ -104,12 +108,32 @@ export class AppService {
   getTest(): any {
     return kakaoTemplate.simpleText('테스트 텍스트')
   }
-  
-  showMyId(userId: string) {
-    return kakaoTemplate.simpleText(`너의 카카오톡 고유 ID는:\n${userId}`);
-  }
 
-  
+  async postShowMyId(body: unknown) {
+    await this.slackService.web.chat.postMessage({
+      channel: slackChannel.joinChannel,
+      blocks: [
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: '신규유저가입',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            text: `\`\`\`${JSON.stringify(body, null, 2)}\`\`\``,
+            type: 'mrkdwn',
+          },
+        },
+      ],
+    })
+
+    return kakaoTemplate.simpleText(
+      `너의 카카오톡 고유 ID는:\n${JSON.stringify(body)}`,
+    )
+  }
 
   async postJoinUser(joinUserDTO: JoinUserDTO) {
     const web = new WebClient(env.SLACK_TOKEN)
