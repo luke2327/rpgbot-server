@@ -9,16 +9,16 @@ import { CharactersEntity } from './characters.entity'
 
 @Entity('stats') // DB 테이블 이름 'stats'
 export class StatsEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'stats_id' })
   statsId: number
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ name: 'character_id', type: 'int', nullable: false })
   characterId: number // characters 테이블의 characterId와 연결
 
-  @Column({ type: 'int', default: 100 })
+  @Column({ name: 'hp_current', type: 'int', default: 100 })
   hpCurrent: number // 현재 HP
 
-  @Column({ type: 'int', default: 100 })
+  @Column({ name: 'hp_max', type: 'int', default: 100 })
   hpMax: number // 최대 HP
 
   @Column({ type: 'int', default: 100 })
@@ -34,6 +34,7 @@ export class StatsEntity {
   luk: number // 행운
 
   @Column({
+    name: 'updated_at',
     type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
