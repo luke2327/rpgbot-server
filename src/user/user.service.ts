@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
-import uuid from 'uuid'
+import { v7 } from 'uuid'
 import { UserEntity } from './entities/user.entity'
 import { SaveUserDto } from './dto/saveUser.dto'
 import { CharactersEntity } from './entities/characters.entity'
-import { StatsEntity } from './entities/stats.entity';
-import { kakaoTemplate } from '../libs/kakao.utils';
-import { SlackService } from '../slack/slack.service';
-import { slackChannel } from '../constants/slack-channel';
+import { StatsEntity } from './entities/stats.entity'
+import { kakaoTemplate } from '../libs/kakao.utils'
+import { SlackService } from '../slack/slack.service'
+import { slackChannel } from '../constants/slack-channel'
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,7 @@ export class UserService {
     const { id: kakaoUserId } = body.userRequest.user
     const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
     const { job, sex } = body.action.clientExtra
-    const userId = uuid.v7()
+    const userId = v7()
 
     await this.dataSource.transaction(async (manager) => {
       // 유저 생성
@@ -54,7 +54,7 @@ export class UserService {
       await manager.save(character)
 
       const stat = manager.create(StatsEntity, {
-        characterId: character.characterId
+        characterId: character.characterId,
       })
       await manager.save(stat)
 

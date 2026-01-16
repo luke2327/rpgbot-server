@@ -4,12 +4,11 @@ import {
   Column,
   OneToOne,
   JoinColumn,
-  EntitySchema,
 } from 'typeorm'
 import { CharactersEntity } from './characters.entity'
 
 @Entity('stats') // DB 테이블 이름 'stats'
-export class StatsEntity extends EntitySchema {
+export class StatsEntity {
   @PrimaryGeneratedColumn()
   statsId: number
 
