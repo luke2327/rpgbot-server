@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { AppController } from 'src/app.controller'
+import { AppService } from 'src/app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { env } from './configs/env'
-import { UserModule } from './user/user.module'
-import { SlackService } from './slack/slack.service'
-import { MockModule } from './mock/mock.module'
-import { entitiesResolver } from './libs/entitiesResolver'
-import { LoggerModule } from './logger'
+import { env } from 'src/configs/env'
+import { UserModule } from 'src/user/user.module'
+import { SlackService } from 'src/slack/slack.service'
+import { MockModule } from 'src/mock/mock.module'
+import { entitiesResolver } from 'src/libs/entitiesResolver'
+import { LoggerModule } from 'src/logger'
 
 @Module({
   imports: [

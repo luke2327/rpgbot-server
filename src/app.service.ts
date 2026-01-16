@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { WebClient } from '@slack/web-api'
-import { JoinUserDTO } from './dtos/joinUserDto'
-import { env } from './configs/env'
-import { kakaoTemplate } from './libs/kakao.utils'
-import { SlackService } from './slack/slack.service'
-import { slackChannel } from './constants/slack-channel'
-import { LoggerService } from './logger'
+import { JoinUserDTO } from 'src/dtos/joinUserDto'
+import { env } from 'src/configs/env'
+import { kakaoTemplate } from 'src/libs/kakao.utils'
+import { SlackService } from 'src/slack/slack.service'
+import { slackChannel } from 'src/constants/slack-channel'
+import { LoggerService } from 'src/logger'
 import mysql from 'mysql2/promise'
 
 const pool = mysql.createPool({
