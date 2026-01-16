@@ -117,10 +117,6 @@ export class AppService {
     `
   }
 
-  getTest(): any {
-    return kakaoTemplate.simpleText('테스트 텍스트')
-  }
-
   async postShowMyId(body: unknown) {
     await this.slackService.web.chat.postMessage({
       channel: slackChannel.joinChannel,

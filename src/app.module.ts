@@ -4,9 +4,10 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { env } from './configs/env'
-import { UserEntity } from './user/user.entity'
 import { UserModule } from './user/user.module'
 import { SlackService } from './slack/slack.service'
+import { MockModule } from './mock/mock.module'
+import { entitiesResolver } from './libs/entitiesResolver'
 
 @Module({
   imports: [
@@ -21,10 +22,11 @@ import { SlackService } from './slack/slack.service'
       username: env.DB_USER,
       password: env.DB_PASSWORD,
       database: env.DB_NAME,
-      entities: [UserEntity],
+      entities: entitiesResolver(),
       synchronize: false,
     }),
     UserModule,
+    MockModule,
   ],
   controllers: [AppController],
   providers: [AppService, SlackService],

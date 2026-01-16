@@ -4,11 +4,12 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  EntitySchema,
 } from 'typeorm'
-import { CharacterEntity } from './character.entity'
+import { CharactersEntity } from './characters.entity'
 
 @Entity('stats') // DB 테이블 이름 'stats'
-export class StatEntity {
+export class StatsEntity extends EntitySchema {
   @PrimaryGeneratedColumn()
   statsId: number
 
@@ -41,7 +42,7 @@ export class StatEntity {
   updatedAt: Date
 
   // 이 스탯이 어떤 캐릭터의 것인지 연결 (1:1 관계)
-  @OneToOne(() => CharacterEntity)
-  @JoinColumn({ name: 'characterId' })
-  character: CharacterEntity
+  @OneToOne(() => CharactersEntity)
+  @JoinColumn({ name: 'character_id', referencedColumnName: 'characterId' })
+  character: CharactersEntity
 }
