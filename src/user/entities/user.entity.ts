@@ -1,4 +1,4 @@
-import { uuidTransformer } from 'src/libs/utils'
+import { uuidTransformer } from '../../libs/utils'
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm'
 import { CharactersEntity } from './characters.entity'
 

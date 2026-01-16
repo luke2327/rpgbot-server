@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserService } from './user.service'
 import { UserController } from './user.controller'
 import { UserEntity } from './entities/user.entity'
-import { SlackService } from '../slack/slack.service';
+import { SlackService } from 'src/slack/slack.service'
 
 @Module({
   providers: [UserService, SlackService],
