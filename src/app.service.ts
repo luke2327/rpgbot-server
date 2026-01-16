@@ -5,6 +5,7 @@ import { env } from './configs/env'
 import { kakaoTemplate } from './libs/kakao.utils'
 import { SlackService } from './slack/slack.service'
 import { slackChannel } from './constants/slack-channel'
+import { LoggerService } from './logger'
 import mysql from 'mysql2/promise'
 
 const pool = mysql.createPool({
@@ -20,7 +21,12 @@ const pool = mysql.createPool({
 
 @Injectable()
 export class AppService {
-  constructor(private readonly slackService: SlackService) {}
+  constructor(
+    private readonly slackService: SlackService,
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext(AppService.name)
+  }
 
   getHello(): string {
     return `
@@ -171,9 +177,7 @@ export class AppService {
       ],
     })
 
-    console.log(
-      `Successfully send message ${result.ts} in conversation T0A8YGX24FK`,
-    )
+    this.logger.log(`Successfully send message ${result.ts} in conversation T0A8YGX24FK`, { method: 'postJoinUser' })
   }
 
   async joinUser(body: unknown) {
@@ -209,7 +213,7 @@ export class AppService {
           `이제 모험을 시작할 수 있어요!`,
       )
     } catch (error) {
-      console.error('DB 저장 에러:', error)
+      this.logger.error('DB 저장 에러', error instanceof Error ? error.stack : String(error), { method: 'joinUser' })
       return kakaoTemplate.simpleText(
         '가입 중 오류가 발생했습니다. 다시 시도해주세요.',
       )
@@ -236,7 +240,7 @@ export class AppService {
     }
 
     const connection = await pool.getConnection().catch((err) => {
-      console.error('DB 연결 실패:', err)
+      this.logger.error('DB 연결 실패', err instanceof Error ? err.stack : String(err), { method: 'saveJob' })
       return null
     })
 
@@ -260,7 +264,7 @@ export class AppService {
         `직업이 ${job}으로 저장됐습니다! (테스트 userId: ${testUserId})`,
       )
     } catch (error) {
-      console.error('DB 저장 에러:', error)
+      this.logger.error('DB 저장 에러', error instanceof Error ? error.stack : String(error), { method: 'saveJob' })
       return kakaoTemplate.simpleText('저장 실패! 다시 시도해주세요.')
     } finally {
       connection.release()

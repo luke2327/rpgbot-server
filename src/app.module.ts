@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module'
 import { SlackService } from './slack/slack.service'
 import { MockModule } from './mock/mock.module'
 import { entitiesResolver } from './libs/entitiesResolver'
+import { LoggerModule } from './logger'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { entitiesResolver } from './libs/entitiesResolver'
       entities: entitiesResolver(),
       synchronize: false,
     }),
+    LoggerModule,
     UserModule,
     MockModule,
   ],
