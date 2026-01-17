@@ -5,6 +5,7 @@ import { AppService } from 'src/app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { env } from 'src/configs/env'
 import { UserModule } from 'src/user/user.module'
+import { MonstersModule } from './monsters/monsters.module'
 import { SlackService } from 'src/slack/slack.service'
 import { MockModule } from 'src/mock/mock.module'
 import { entitiesResolver } from 'src/libs/entitiesResolver'
@@ -29,6 +30,7 @@ import { LoggerModule } from 'src/logger'
     LoggerModule,
     UserModule,
     MockModule,
+    MonstersModule,
   ],
   controllers: [AppController],
   providers: [AppService, SlackService],
