@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import { UserEntity } from './entities/user.entity'
 import { SaveUserDto } from './dto/saveUser.dto'
 import { CharactersEntity } from './entities/characters.entity'
@@ -35,7 +35,7 @@ export class UserService {
     const { id: kakaoUserId } = body.userRequest.user
     const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
     const { job, sex } = body.action.clientExtra
-    const userId = uuid.v7()
+    const userId = uuid.v4()
 
     await this.dataSource.transaction(async (manager) => {
       // 유저 생성
