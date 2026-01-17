@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
-import { v4 } from 'uuid'
 import { UserEntity } from './entities/user.entity'
 import { SaveUserDto } from './dto/saveUser.dto'
 import { CharactersEntity } from './entities/characters.entity'
@@ -23,31 +22,29 @@ export class UserService {
     return this.usersRepository.find()
   }
 
-  findOne(userId: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOneBy({ userId })
+  // 카카오 유저 ID로 조회
+  findOne(kakaoUserId: string): Promise<UserEntity | null> {
+    return this.usersRepository.findOneBy({ kakaoUserId })
   }
 
-  async remove(userId: string): Promise<void> {
-    await this.usersRepository.delete(userId)
+  // 카카오 유저 ID로 삭제
+  async remove(kakaoUserId: string): Promise<void> {
+    await this.usersRepository.delete(kakaoUserId)
   }
 
   async saveUser(body: SaveUserDto) {
     const { id: kakaoUserId } = body.userRequest.user
-    const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
     const { job, sex } = body.action.clientExtra
-    const userId = v4()
 
     await this.dataSource.transaction(async (manager) => {
       // 유저 생성
       const user = manager.create(UserEntity, {
-        userId,
         kakaoUserId,
-        kakaoBotUserKey,
       })
       await manager.save(user)
 
       const character = manager.create(CharactersEntity, {
-        userId,
+        userId: kakaoUserId, // 카카오 유저 ID 사용
         job,
         sex,
       })
@@ -59,9 +56,7 @@ export class UserService {
       await manager.save(stat)
 
       const result = {
-        userId,
         kakaoUserId,
-        kakaoBotUserKey,
         job,
         sex,
       }
