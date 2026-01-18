@@ -6,15 +6,14 @@ import {
   ManyToOne,
 } from 'typeorm'
 import { UserEntity } from './user.entity'
-import { uuidTransformer } from 'src/libs/utils'
 
 @Entity('characters') // DB 테이블 이름은 'characters'
 export class CharactersEntity {
   @PrimaryGeneratedColumn({ name: 'character_id' }) // 자동으로 1, 2, 3... 증가하는 ID
   characterId: number
 
-  @Column({ name: 'user_id', type: 'binary', length: 16, transformer: uuidTransformer }) // user 테이블의 user_id와 같은 타입
-  userId: string // 바이너리 형태로 저장
+  @Column({ name: 'user_id', type: 'varchar', length: 100 })
+  userId: string // 카카오 유저 ID (kakao_user_id)
 
   @Column({ type: 'enum', enum: ['warrior', 'mage'], nullable: false })
   job: 'warrior' | 'mage' // 직업은 전사나 마법사만 가능
@@ -48,6 +47,6 @@ export class CharactersEntity {
 
   // 이 캐릭터가 어떤 유저의 것인지 연결 (1:N 관계)
   @ManyToOne(() => UserEntity, (user) => user.characters, { nullable: false })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'userId' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'kakaoUserId' })
   user: UserEntity
 }

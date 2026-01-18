@@ -1,28 +1,16 @@
-import { uuidTransformer } from 'src/libs/utils'
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm'
 import { CharactersEntity } from './characters.entity'
 
 @Entity('user')
 export class UserEntity {
-  @PrimaryColumn({
-    name: 'user_id',
-    type: 'binary',
-    length: 16,
-    transformer: uuidTransformer,
-  })
-  userId: string
-
-  @Column({ name: 'kakao_user_id', type: 'varchar', nullable: false })
+  @PrimaryColumn({ name: 'kakao_user_id', type: 'varchar', length: 100 })
   kakaoUserId: string
-
-  @Column({ name: 'kakao_bot_user_key', type: 'varchar', nullable: false })
-  kakaoBotUserKey: string
 
   @Column({
     name: 'created_at',
     type: 'timestamp',
     nullable: false,
-    default: 'CURRENT_TIMESTAMP',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date
 

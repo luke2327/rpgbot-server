@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
-import * as uuid from 'uuid'
 import { UserEntity } from './entities/user.entity'
 import { SaveUserDto } from './dto/saveUser.dto'
 import { CharactersEntity } from './entities/characters.entity'
-import { StatsEntity } from './entities/stats.entity';
-import { kakaoTemplate } from '../libs/kakao.utils';
-import { SlackService } from '../slack/slack.service';
-import { slackChannel } from '../constants/slack-channel';
+import { StatsEntity } from './entities/stats.entity'
+import { kakaoTemplate } from 'src/libs/kakao.utils'
+import { SlackService } from 'src/slack/slack.service'
+import { slackChannel } from 'src/constants/slack-channel'
 
 @Injectable()
 export class UserService {
@@ -23,36 +22,44 @@ export class UserService {
     return this.usersRepository.find()
   }
 
-  findOne(userId: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOneBy({ userId })
+  // 카카오 유저 ID로 조회
+  findOne(kakaoUserId: string): Promise<UserEntity | null> {
+    return this.usersRepository.findOneBy({ kakaoUserId })
   }
 
-  async remove(userId: string): Promise<void> {
-    await this.usersRepository.delete(userId)
+  // 카카오 유저 ID로 삭제
+  async remove(kakaoUserId: string): Promise<void> {
+    await this.usersRepository.delete(kakaoUserId)
   }
 
   async saveUser(body: SaveUserDto) {
-    try {
-      console.log('[saveUser] 시작 - body:', JSON.stringify(body, null, 2))
+    const { id: kakaoUserId } = body.userRequest.user
+    const { job, sex } = body.action.clientExtra
 
-      const { id: kakaoUserId } = body.userRequest.user
-      const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
-      const { job, sex } = body.action.clientExtra
-      const userId = uuid.v4()
+    await this.dataSource.transaction(async (manager) => {
+      // 유저 생성
+      const user = manager.create(UserEntity, {
+        kakaoUserId,
+      })
+      await manager.save(user)
 
-      console.log('[saveUser] 파싱 완료:', { kakaoUserId, kakaoBotUserKey, job, sex, userId })
+      const character = manager.create(CharactersEntity, {
+        userId: kakaoUserId, // 카카오 유저 ID 사용
+        job,
+        sex,
+      })
+      await manager.save(character)
 
-      await this.dataSource.transaction(async (manager) => {
-        console.log('[saveUser] 트랜잭션 시작')
+      const stat = manager.create(StatsEntity, {
+        characterId: character.characterId,
+      })
+      await manager.save(stat)
 
-        // 유저 생성
-        console.log('[saveUser] UserEntity 생성 시도')
-        const user = manager.create(UserEntity, {
-          userId,
-          kakaoUserId,
-          kakaoBotUserKey,
-        })
-        console.log('[saveUser] UserEntity 생성 완료:', user)
+      const result = {
+        kakaoUserId,
+        job,
+        sex,
+      }
 
         console.log('[saveUser] User 저장 시도')
         await manager.save(user)

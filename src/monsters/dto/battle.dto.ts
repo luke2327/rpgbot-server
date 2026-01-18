@@ -1,5 +1,10 @@
+export class BattleRequest {
+  characterId: number
+  monsterId: number
+}
+
 export interface BattleTurn {
-  attacker: 'character' | 'monster'
+  attacker: string // 'character' or 'monster'
   damage: number
   targetHp: number
 }
