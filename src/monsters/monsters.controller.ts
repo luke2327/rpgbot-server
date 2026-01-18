@@ -30,7 +30,8 @@ export class MonstersController {
 
       // 카카오 챗봇 요청에서 데이터 추출
       const kakaoUserId = body.userRequest?.user?.id
-      const monsterId = parseInt(body.action?.params?.monster_id)
+      const monsterIdStr = body.action?.clientExtra?.monster_id || body.action?.detailParams?.monster_id || ''
+      const monsterId = parseInt(monsterIdStr)
 
       // Slack 로그: 파싱 결과
       await this.slackService.web.chat.postMessage({
