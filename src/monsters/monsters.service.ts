@@ -23,6 +23,13 @@ export class MonstersService {
     return this.monstersRepository.find()
   }
 
+  // 특정 몬스터 조회
+  async findOne(monsterId: number): Promise<MonstersEntity | null> {
+    return this.monstersRepository.findOne({
+      where: { monsterId },
+    })
+  }
+
   // 카카오 유저 ID로 전투 시작 (카카오 챗봇용)
   async battleByKakaoUser(
     kakaoUserId: string,
