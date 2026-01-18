@@ -6,7 +6,8 @@ import { CharactersEntity } from './characters.entity'
 export class UserEntity {
   @PrimaryColumn({
     name: 'user_id',
-    type: 'uuid',
+    type: 'binary',
+    length: 16,
     transformer: uuidTransformer,
   })
   userId: string

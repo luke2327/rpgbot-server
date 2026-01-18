@@ -13,7 +13,7 @@ export class CharactersEntity {
   @PrimaryGeneratedColumn({ name: 'character_id' }) // 자동으로 1, 2, 3... 증가하는 ID
   characterId: number
 
-  @Column({ name: 'user_id', type: 'uuid', transformer: uuidTransformer }) // user 테이블의 user_id와 같은 타입
+  @Column({ name: 'user_id', type: 'binary', length: 16, transformer: uuidTransformer }) // user 테이블의 user_id와 같은 타입
   userId: string // 바이너리 형태로 저장
 
   @Column({ type: 'enum', enum: ['warrior', 'mage'], nullable: false })

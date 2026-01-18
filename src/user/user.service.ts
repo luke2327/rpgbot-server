@@ -32,61 +32,90 @@ export class UserService {
   }
 
   async saveUser(body: SaveUserDto) {
-    const { id: kakaoUserId } = body.userRequest.user
-    const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
-    const { job, sex } = body.action.clientExtra
-    const userId = uuid.v4()
+    try {
+      console.log('[saveUser] 시작 - body:', JSON.stringify(body, null, 2))
 
-    await this.dataSource.transaction(async (manager) => {
-      // 유저 생성
-      const user = manager.create(UserEntity, {
-        userId,
-        kakaoUserId,
-        kakaoBotUserKey,
-      })
-      await manager.save(user)
+      const { id: kakaoUserId } = body.userRequest.user
+      const { botUserKey: kakaoBotUserKey } = body.userRequest.user.properties
+      const { job, sex } = body.action.clientExtra
+      const userId = uuid.v4()
 
-      const character = manager.create(CharactersEntity, {
-        userId,
-        job,
-        sex,
-      })
-      await manager.save(character)
+      console.log('[saveUser] 파싱 완료:', { kakaoUserId, kakaoBotUserKey, job, sex, userId })
 
-      const stat = manager.create(StatsEntity, {
-        characterId: character.characterId
-      })
-      await manager.save(stat)
+      await this.dataSource.transaction(async (manager) => {
+        console.log('[saveUser] 트랜잭션 시작')
 
-      const result = {
-        userId,
-        kakaoUserId,
-        kakaoBotUserKey,
-        job,
-        sex,
-      }
+        // 유저 생성
+        console.log('[saveUser] UserEntity 생성 시도')
+        const user = manager.create(UserEntity, {
+          userId,
+          kakaoUserId,
+          kakaoBotUserKey,
+        })
+        console.log('[saveUser] UserEntity 생성 완료:', user)
 
-      await this.slackService.web.chat.postMessage({
-        channel: slackChannel.joinChannel,
-        blocks: [
-          {
-            type: 'header',
-            text: {
-              type: 'plain_text',
-              text: '신규유저가입',
+        console.log('[saveUser] User 저장 시도')
+        await manager.save(user)
+        console.log('[saveUser] User 저장 완료')
+
+        console.log('[saveUser] CharactersEntity 생성 시도')
+        const character = manager.create(CharactersEntity, {
+          userId,
+          job,
+          sex,
+        })
+        console.log('[saveUser] CharactersEntity 생성 완료:', character)
+
+        console.log('[saveUser] Character 저장 시도')
+        await manager.save(character)
+        console.log('[saveUser] Character 저장 완료, characterId:', character.characterId)
+
+        console.log('[saveUser] StatsEntity 생성 시도')
+        const stat = manager.create(StatsEntity, {
+          characterId: character.characterId
+        })
+        console.log('[saveUser] StatsEntity 생성 완료:', stat)
+
+        console.log('[saveUser] Stats 저장 시도')
+        await manager.save(stat)
+        console.log('[saveUser] Stats 저장 완료')
+
+        const result = {
+          userId,
+          kakaoUserId,
+          kakaoBotUserKey,
+          job,
+          sex,
+        }
+
+        console.log('[saveUser] Slack 메시지 전송 시도')
+        await this.slackService.web.chat.postMessage({
+          channel: slackChannel.joinChannel,
+          blocks: [
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: '신규유저가입',
+              },
             },
-          },
-          {
-            type: 'section',
-            text: {
-              text: `\`\`\`${JSON.stringify(result, null, 2)}\`\`\``,
-              type: 'mrkdwn',
+            {
+              type: 'section',
+              text: {
+                text: `\`\`\`${JSON.stringify(result, null, 2)}\`\`\``,
+                type: 'mrkdwn',
+              },
             },
-          },
-        ],
+          ],
+        })
+        console.log('[saveUser] Slack 메시지 전송 완료')
       })
-    })
 
-    return kakaoTemplate.simpleText('유저 저장 완료')
+      console.log('[saveUser] 트랜잭션 완료')
+      return kakaoTemplate.simpleText('유저 저장 완료')
+    } catch (error) {
+      console.error('[saveUser] 에러 발생:', error)
+      throw error
+    }
   }
 }
