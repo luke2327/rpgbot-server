@@ -28,11 +28,16 @@ export class MonstersService {
     kakaoUserId: string,
     monsterId: number,
   ): Promise<BattleResult> {
+    console.log('[battleByKakaoUser] 시작:', { kakaoUserId, monsterId })
+
     return await this.dataSource.transaction(async (manager) => {
       // 카카오 유저 ID로 유저 찾기
+      console.log('[battleByKakaoUser] 유저 조회 중...')
       const user = await manager.findOne(UserEntity, {
         where: { kakaoUserId },
       })
+      console.log('[battleByKakaoUser] 유저 조회 결과:', user)
+
       if (!user) {
         throw new NotFoundException(
           `User with kakao ID ${kakaoUserId} not found`,
@@ -40,14 +45,21 @@ export class MonstersService {
       }
 
       // 해당 유저의 캐릭터 찾기 (첫 번째 캐릭터 사용)
+      console.log('[battleByKakaoUser] 캐릭터 조회 중... userId:', user.kakaoUserId)
       const character = await manager.findOne(CharactersEntity, {
         where: { userId: user.kakaoUserId },
       })
+      console.log('[battleByKakaoUser] 캐릭터 조회 결과:', character)
+
       if (!character) {
         throw new NotFoundException(`Character for user ${user.kakaoUserId} not found`)
       }
 
       // 기존 battle 로직 실행
+      console.log('[battleByKakaoUser] 전투 시작:', {
+        characterId: character.characterId,
+        monsterId,
+      })
       return this.battle(character.characterId, monsterId, manager)
     })
   }

@@ -16,20 +16,42 @@ export class MonstersController {
 
   @Post('battle')
   async battle(@Body() body: KakaoBattleRequestDto) {
-    // 카카오 챗봇 요청에서 데이터 추출
-    const kakaoUserId = body.userRequest.user.id
-    const monsterId = parseInt(body.action.params.monster_id)
+    try {
+      console.log('[battle] 요청 받음:', JSON.stringify(body, null, 2))
 
-    const battleResult = await this.monstersService.battleByKakaoUser(
-      kakaoUserId,
-      monsterId,
-    )
+      // 카카오 챗봇 요청에서 데이터 추출
+      const kakaoUserId = body.userRequest?.user?.id
+      const monsterId = parseInt(body.action?.params?.monster_id)
 
-    // 전투 과정을 텍스트로 변환
-    const battleLog = this.formatBattleLog(battleResult)
+      console.log('[battle] 파싱 완료:', { kakaoUserId, monsterId })
 
-    // 카카오 챗봇 응답 형식으로 반환
-    return kakaoTemplate.simpleText(battleLog)
+      if (!kakaoUserId) {
+        throw new Error('kakaoUserId가 없습니다')
+      }
+      if (!monsterId || isNaN(monsterId)) {
+        throw new Error('monsterId가 유효하지 않습니다')
+      }
+
+      const battleResult = await this.monstersService.battleByKakaoUser(
+        kakaoUserId,
+        monsterId,
+      )
+
+      console.log('[battle] 전투 결과:', battleResult)
+
+      // 전투 과정을 텍스트로 변환
+      const battleLog = this.formatBattleLog(battleResult)
+
+      console.log('[battle] 응답 전송')
+
+      // 카카오 챗봇 응답 형식으로 반환
+      return kakaoTemplate.simpleText(battleLog)
+    } catch (error) {
+      console.error('[battle] 에러 발생:', error)
+      return kakaoTemplate.simpleText(
+        `전투 중 오류가 발생했습니다.\n${error.message}`,
+      )
+    }
   }
 
   private formatBattleLog(result: BattleResult): string {
