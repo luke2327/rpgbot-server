@@ -10,7 +10,6 @@ import { MockModule } from './mock/mock.module'
 import { MonstersModule } from './monsters/monsters.module'
 import { entitiesResolver } from './libs/entitiesResolver'
 import { LoggerModule } from './logger'
-import { MonstersModule } from './monsters/monsters.module'
 
 @Module({
   imports: [

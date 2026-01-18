@@ -13,7 +13,7 @@ import { slackChannel } from 'src/constants/slack-channel'
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly usersRepository: Repository<UserEntity>, // UserRepository 주입
+    private readonly usersRepository: Repository<UserEntity>,
     private readonly dataSource: DataSource,
     private readonly slackService: SlackService,
   ) {}
@@ -22,12 +22,10 @@ export class UserService {
     return this.usersRepository.find()
   }
 
-  // 카카오 유저 ID로 조회
   findOne(kakaoUserId: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ kakaoUserId })
   }
 
-  // 카카오 유저 ID로 삭제
   async remove(kakaoUserId: string): Promise<void> {
     await this.usersRepository.delete(kakaoUserId)
   }
@@ -44,7 +42,7 @@ export class UserService {
       await manager.save(user)
 
       const character = manager.create(CharactersEntity, {
-        userId: kakaoUserId, // 카카오 유저 ID 사용
+        userId: kakaoUserId,
         job,
         sex,
       })
@@ -61,68 +59,27 @@ export class UserService {
         sex,
       }
 
-        console.log('[saveUser] User 저장 시도')
-        await manager.save(user)
-        console.log('[saveUser] User 저장 완료')
-
-        console.log('[saveUser] CharactersEntity 생성 시도')
-        const character = manager.create(CharactersEntity, {
-          userId,
-          job,
-          sex,
-        })
-        console.log('[saveUser] CharactersEntity 생성 완료:', character)
-
-        console.log('[saveUser] Character 저장 시도')
-        await manager.save(character)
-        console.log('[saveUser] Character 저장 완료, characterId:', character.characterId)
-
-        console.log('[saveUser] StatsEntity 생성 시도')
-        const stat = manager.create(StatsEntity, {
-          characterId: character.characterId
-        })
-        console.log('[saveUser] StatsEntity 생성 완료:', stat)
-
-        console.log('[saveUser] Stats 저장 시도')
-        await manager.save(stat)
-        console.log('[saveUser] Stats 저장 완료')
-
-        const result = {
-          userId,
-          kakaoUserId,
-          kakaoBotUserKey,
-          job,
-          sex,
-        }
-
-        console.log('[saveUser] Slack 메시지 전송 시도')
-        await this.slackService.web.chat.postMessage({
-          channel: slackChannel.joinChannel,
-          blocks: [
-            {
-              type: 'header',
-              text: {
-                type: 'plain_text',
-                text: '신규유저가입',
-              },
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.joinChannel,
+        blocks: [
+          {
+            type: 'header',
+            text: {
+              type: 'plain_text',
+              text: '신규유저가입',
             },
-            {
-              type: 'section',
-              text: {
-                text: `\`\`\`${JSON.stringify(result, null, 2)}\`\`\``,
-                type: 'mrkdwn',
-              },
+          },
+          {
+            type: 'section',
+            text: {
+              text: `\`\`\`${JSON.stringify(result, null, 2)}\`\`\``,
+              type: 'mrkdwn',
             },
-          ],
-        })
-        console.log('[saveUser] Slack 메시지 전송 완료')
+          },
+        ],
       })
+    })
 
-      console.log('[saveUser] 트랜잭션 완료')
-      return kakaoTemplate.simpleText('유저 저장 완료')
-    } catch (error) {
-      console.error('[saveUser] 에러 발생:', error)
-      throw error
-    }
+    return kakaoTemplate.simpleText('유저 저장 완료')
   }
 }

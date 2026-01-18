@@ -1,17 +1,24 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { MonstersEntity } from './entities/monsters.entity'
-import { MonstersService } from './monsters.service'
 import { MonstersController } from './monsters.controller'
+import { MonstersService } from './monsters.service'
+import { MonstersEntity } from './entities/monsters.entity'
+import { UserEntity } from 'src/user/entities/user.entity'
 import { CharactersEntity } from 'src/user/entities/characters.entity'
 import { StatsEntity } from 'src/user/entities/stats.entity'
+import { SlackService } from 'src/slack/slack.service'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MonstersEntity, CharactersEntity, StatsEntity]),
+    TypeOrmModule.forFeature([
+      MonstersEntity,
+      UserEntity,
+      CharactersEntity,
+      StatsEntity,
+    ]),
   ],
-  providers: [MonstersService],
   controllers: [MonstersController],
-  exports: [MonstersService], // 다른 모듈에서 서비스 쓸 수 있게
+  providers: [MonstersService, SlackService],
+  exports: [MonstersService],
 })
 export class MonstersModule {}
