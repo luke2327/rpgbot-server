@@ -4,10 +4,15 @@ import type { KakaoBattleRequestDto } from './dto/kakao-battle.dto'
 import type { BattleResult } from './dto/battle.dto'
 import type { MonstersEntity } from './entities/monsters.entity'
 import { kakaoTemplate } from 'src/libs/kakao.utils'
+import { SlackService } from 'src/slack/slack.service'
+import { slackChannel } from 'src/constants/slack-channel'
 
 @Controller('monsters')
 export class MonstersController {
-  constructor(private readonly monstersService: MonstersService) {}
+  constructor(
+    private readonly monstersService: MonstersService,
+    private readonly slackService: SlackService,
+  ) {}
 
   @Get('list')
   async findAll(): Promise<MonstersEntity[]> {
@@ -17,13 +22,21 @@ export class MonstersController {
   @Post('battle')
   async battle(@Body() body: KakaoBattleRequestDto) {
     try {
-      console.log('[battle] 요청 받음:', JSON.stringify(body, null, 2))
+      // Slack 로그: 요청 받음
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `🎮 [전투 요청]\n\`\`\`${JSON.stringify(body, null, 2)}\`\`\``,
+      })
 
       // 카카오 챗봇 요청에서 데이터 추출
       const kakaoUserId = body.userRequest?.user?.id
       const monsterId = parseInt(body.action?.params?.monster_id)
 
-      console.log('[battle] 파싱 완료:', { kakaoUserId, monsterId })
+      // Slack 로그: 파싱 결과
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `✅ [파싱 완료]\nkakaoUserId: ${kakaoUserId}\nmonsterId: ${monsterId}`,
+      })
 
       if (!kakaoUserId) {
         throw new Error('kakaoUserId가 없습니다')
@@ -37,17 +50,24 @@ export class MonstersController {
         monsterId,
       )
 
-      console.log('[battle] 전투 결과:', battleResult)
+      // Slack 로그: 전투 결과
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `⚔️ [전투 완료]\n승리: ${battleResult.victory ? '✅' : '❌'}\n\`\`\`${JSON.stringify(battleResult, null, 2)}\`\`\``,
+      })
 
       // 전투 과정을 텍스트로 변환
       const battleLog = this.formatBattleLog(battleResult)
 
-      console.log('[battle] 응답 전송')
-
       // 카카오 챗봇 응답 형식으로 반환
       return kakaoTemplate.simpleText(battleLog)
     } catch (error) {
-      console.error('[battle] 에러 발생:', error)
+      // Slack 로그: 에러
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `❌ [전투 에러]\n\`\`\`${error.message}\n\n${error.stack}\`\`\``,
+      })
+
       return kakaoTemplate.simpleText(
         `전투 중 오류가 발생했습니다.\n${error.message}`,
       )
