@@ -42,7 +42,7 @@ export class UserService {
       await manager.save(user)
 
       const character = manager.create(CharactersEntity, {
-        userId: kakaoUserId,
+        userId: user.userId, // 생성된 user의 PK 사용
         job,
         sex,
       })

@@ -53,11 +53,11 @@ export class MonstersService {
       // 해당 유저의 캐릭터 찾기 (첫 번째 캐릭터 사용)
       await this.slackService.web.chat.postMessage({
         channel: slackChannel.botTest,
-        text: `🔍 [캐릭터 조회]\nuserId: ${user.kakaoUserId}`,
+        text: `🔍 [캐릭터 조회]\nuserId: ${user.userId}`,
       })
 
       const character = await manager.findOne(CharactersEntity, {
-        where: { userId: user.kakaoUserId },
+        where: { userId: user.userId },
       })
 
       await this.slackService.web.chat.postMessage({
@@ -66,7 +66,7 @@ export class MonstersService {
       })
 
       if (!character) {
-        throw new NotFoundException(`Character for user ${user.kakaoUserId} not found`)
+        throw new NotFoundException(`Character for user ${user.userId} not found`)
       }
 
       // 기존 battle 로직 실행
