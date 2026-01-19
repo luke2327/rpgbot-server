@@ -13,7 +13,7 @@ import { slackChannel } from 'src/constants/slack-channel'
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly usersRepository: Repository<UserEntity>, // UserRepository 주입
+    private readonly usersRepository: Repository<UserEntity>,
     private readonly dataSource: DataSource,
     private readonly slackService: SlackService,
   ) {}
@@ -22,12 +22,10 @@ export class UserService {
     return this.usersRepository.find()
   }
 
-  // 카카오 유저 ID로 조회
   findOne(kakaoUserId: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ kakaoUserId })
   }
 
-  // 카카오 유저 ID로 삭제
   async remove(kakaoUserId: string): Promise<void> {
     await this.usersRepository.delete(kakaoUserId)
   }
@@ -44,7 +42,7 @@ export class UserService {
       await manager.save(user)
 
       const character = manager.create(CharactersEntity, {
-        userId: kakaoUserId, // 카카오 유저 ID 사용
+        userId: user.userId, // 생성된 user의 PK 사용
         job,
         sex,
       })

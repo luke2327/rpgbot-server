@@ -7,9 +7,9 @@ import { env } from './configs/env'
 import { UserModule } from './user/user.module'
 import { SlackService } from './slack/slack.service'
 import { MockModule } from './mock/mock.module'
+import { MonstersModule } from './monsters/monsters.module'
 import { entitiesResolver } from './libs/entitiesResolver'
 import { LoggerModule } from './logger'
-import { MonstersModule } from './monsters/monsters.module'
 
 @Module({
   imports: [

@@ -23,6 +23,18 @@ export class MonstersEntity {
   @Column({ name: 'level', type: 'int', nullable: false, default: 1 })
   level: number
 
+  @Column({ name: 'image_url', type: 'varchar', length: 500, nullable: true })
+  imageUrl: string | null
+
+  @Column({ name: 'name_en', type: 'varchar', length: 100, nullable: true })
+  nameEn: string | null
+
+  @Column({ name: 'simple_text', type: 'text', nullable: true })
+  simpleText: string | null
+
+  @Column({ name: 'card_description', type: 'text', nullable: true })
+  cardDescription: string | null
+
   @Column({
     name: 'created_at',
     type: 'datetime',

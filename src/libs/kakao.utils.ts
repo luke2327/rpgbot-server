@@ -62,5 +62,7 @@ type TextCard = {
 type CardButton = {
   action: string
   label: string
-  webLinkUrl: string
+  webLinkUrl?: string
+  blockId?: string
+  extra?: Record<string, any>
 }
