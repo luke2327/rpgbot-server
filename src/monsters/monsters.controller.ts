@@ -1,17 +1,19 @@
 import { Controller, Post, Body, Get } from '@nestjs/common'
 import { MonstersService } from './monsters.service'
-import type { KakaoBattleRequestDto } from './dto/kakao-battle.dto'
-import type { BattleResult } from './dto/battle.dto'
-import type { MonstersEntity } from './entities/monsters.entity'
+import type { KakaoBattleRequestDto } from 'src/dtos/kakao-battle.dto'
+import type { BattleResult } from 'src/dtos/battle.dto'
+import type { MonstersEntity } from 'src/entities/monsters.entity'
 import { kakaoTemplate } from 'src/libs/kakao.utils'
 import { SlackService } from 'src/slack/slack.service'
 import { slackChannel } from 'src/constants/slack-channel'
+import { ErrorLogService } from 'src/error-log'
 
 @Controller('monsters')
 export class MonstersController {
   constructor(
     private readonly monstersService: MonstersService,
     private readonly slackService: SlackService,
+    private readonly errorLogService: ErrorLogService,
   ) {}
 
   @Get('list')
@@ -38,8 +40,19 @@ export class MonstersController {
         text: `🔍 [몬스터 정보 조회]\nmonsterId: ${monsterId}`,
       })
 
+      // 몬스터 ID가 유효하지 않은 경우
       if (!monsterId || isNaN(monsterId)) {
-        throw new Error('monsterId가 유효하지 않습니다')
+        const message = 'monsterId가 유효하지 않습니다'
+        await this.errorLogService.create({
+          level: 'error',
+          message,
+          context: MonstersController.name,
+          method: 'getMonsterInfo',
+          requestUrl: '/monsters/info',
+          requestMethod: 'POST',
+          metadata: { monsterIdStr, body },
+        })
+        throw new Error(message)
       }
 
       // 몬스터 정보 조회
@@ -128,11 +141,35 @@ export class MonstersController {
         text: `✅ [파싱 완료]\nkakaoUserId: ${kakaoUserId}\nmonsterId: ${monsterId}`,
       })
 
+      // 카카오 유저 ID가 없는 경우
       if (!kakaoUserId) {
-        throw new Error('kakaoUserId가 없습니다')
+        const message = 'kakaoUserId가 없습니다'
+        await this.errorLogService.create({
+          level: 'error',
+          message,
+          context: MonstersController.name,
+          method: 'battle',
+          requestUrl: '/monsters/battle',
+          requestMethod: 'POST',
+          metadata: { body },
+        })
+        throw new Error(message)
       }
+      // 
+      // 몬스터 ID가 유효하지 않은 경우
       if (!monsterId || isNaN(monsterId)) {
-        throw new Error('monsterId가 유효하지 않습니다')
+        const message = 'monsterId가 유효하지 않습니다'
+        await this.errorLogService.create({
+          level: 'error',
+          message,
+          context: MonstersController.name,
+          method: 'battle',
+          requestUrl: '/monsters/battle',
+          requestMethod: 'POST',
+          userId: kakaoUserId,
+          metadata: { monsterIdStr, body },
+        })
+        throw new Error(message)
       }
 
       const battleResult = await this.monstersService.battleByKakaoUser(
