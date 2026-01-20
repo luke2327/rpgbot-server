@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MockService } from './mock.service';
-import { CreateMockDto } from './dto/create-mock.dto';
-import { UpdateMockDto } from './dto/update-mock.dto';
+import { CreateMockDto } from 'src/dtos/create-mock.dto'
+import { UpdateMockDto } from 'src/dtos/update-mock.dto'
 
 @Controller('mock')
 export class MockController {
