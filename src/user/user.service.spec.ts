@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 import { UserService } from './user.service'
-import { UserEntity } from './entities/user.entity'
+import { UserEntity } from 'src/entities/user.entity'
 import { SlackService } from 'src/slack/slack.service'
-import { SaveUserDto } from './dto/saveUser.dto'
+import { SaveUserDto } from 'src/dtos/save-user.dto'
 
 describe('UserService', () => {
   let service: UserService
@@ -141,7 +141,6 @@ describe('UserService', () => {
         UserEntity,
         expect.objectContaining({
           kakaoUserId: 'kakao-user-id-123',
-          kakaoBotUserKey: 'bot-user-key-123',
         }),
       )
     })
@@ -229,7 +228,7 @@ describe('UserService', () => {
 
       expect(result).toEqual(mockUser)
       expect(mockUsersRepository.findOneBy).toHaveBeenCalledWith({
-        userId: 'test-id',
+        kakaoUserId: 'test-id',
       })
     })
 

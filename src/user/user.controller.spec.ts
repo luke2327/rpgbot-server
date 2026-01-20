@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { UserController } from './user.controller'
 import { UserService } from './user.service'
 import { LoggerService } from 'src/logger'
-import { SaveUserDto } from './dto/saveUser.dto'
+import { SaveUserDto } from 'src/dtos/save-user.dto'
 
 describe('UserController', () => {
   let controller: UserController

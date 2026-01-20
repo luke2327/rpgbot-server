@@ -10,6 +10,7 @@ import { MockModule } from './mock/mock.module'
 import { MonstersModule } from './monsters/monsters.module'
 import { entitiesResolver } from './libs/entitiesResolver'
 import { LoggerModule } from './logger'
+import { ErrorLogModule } from './error-log'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LoggerModule } from './logger'
       synchronize: false,
     }),
     LoggerModule,
+    ErrorLogModule,
     UserModule,
     MockModule,
     MonstersModule,

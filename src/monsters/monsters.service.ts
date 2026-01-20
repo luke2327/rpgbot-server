@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, DataSource, EntityManager } from 'typeorm'
-import { MonstersEntity } from './entities/monsters.entity'
-import { CharactersEntity } from 'src/user/entities/characters.entity'
-import { StatsEntity } from 'src/user/entities/stats.entity'
-import { UserEntity } from 'src/user/entities/user.entity'
-import { BattleResult, BattleTurn } from './dto/battle.dto'
+import { MonstersEntity } from 'src/entities/monsters.entity'
+import { CharactersEntity } from 'src/entities/characters.entity'
+import { StatsEntity } from 'src/entities/stats.entity'
+import { UserEntity } from 'src/entities/user.entity'
+import { BattleResult, BattleTurn } from 'src/dtos/battle.dto'
 import { SlackService } from 'src/slack/slack.service'
 import { slackChannel } from 'src/constants/slack-channel'
+import { ErrorLogService } from 'src/error-log'
 
 @Injectable()
 export class MonstersService {
@@ -16,6 +17,7 @@ export class MonstersService {
     private monstersRepository: Repository<MonstersEntity>,
     private dataSource: DataSource,
     private slackService: SlackService,
+    private errorLogService: ErrorLogService,
   ) {}
 
   // 모든 몬스터 조회
@@ -51,10 +53,17 @@ export class MonstersService {
         text: `${user ? '✅' : '❌'} [유저 조회 결과]\n\`\`\`${JSON.stringify(user, null, 2)}\`\`\``,
       })
 
+      // 카카오 유저 ID로 유저를 찾을 수 없는 경우
       if (!user) {
-        throw new NotFoundException(
-          `User with kakao ID ${kakaoUserId} not found`,
-        )
+        const message = `User with kakao ID ${kakaoUserId} not found`
+        await this.errorLogService.create({
+          level: 'error',
+          message,
+          context: MonstersService.name,
+          method: 'battleByKakaoUser',
+          metadata: { kakaoUserId, monsterId },
+        })
+        throw new NotFoundException(message)
       }
 
       // 해당 유저의 캐릭터 찾기 (첫 번째 캐릭터 사용)
@@ -72,8 +81,17 @@ export class MonstersService {
         text: `${character ? '✅' : '❌'} [캐릭터 조회 결과]\n\`\`\`${JSON.stringify(character, null, 2)}\`\`\``,
       })
 
+      // 유저의 캐릭터를 찾을 수 없는 경우
       if (!character) {
-        throw new NotFoundException(`Character for user ${user.userId} not found`)
+        const message = `Character for user ${user.userId} not found`
+        await this.errorLogService.create({
+          level: 'error',
+          message,
+          context: MonstersService.name,
+          method: 'battleByKakaoUser',
+          metadata: { userId: user.userId, kakaoUserId, monsterId },
+        })
+        throw new NotFoundException(message)
       }
 
       // 기존 battle 로직 실행
@@ -82,37 +100,61 @@ export class MonstersService {
         text: `⚔️ [전투 로직 시작]\ncharacterId: ${character.characterId}\nmonsterId: ${monsterId}`,
       })
 
-      return this.battle(character.characterId, monsterId, manager)
+      return this.battle(character, monsterId, manager)
     })
   }
 
   // 몬스터 ID로 전투 시작 (내부 헬퍼 메서드)
   private async battle(
-    characterId: number,
+    character: CharactersEntity,
     monsterId: number,
     manager: EntityManager,
   ): Promise<BattleResult> {
-    // 캐릭터와 스탯 조회
-    const character = await manager.findOne(CharactersEntity, {
-      where: { characterId },
-    })
+    const { characterId } = character
+    // 캐릭터가 존재하지 않는 경우
     if (!character) {
-      throw new NotFoundException(`Character with ID ${characterId} not found`)
+      const message = `Character with ID ${characterId} not found`
+      await this.errorLogService.create({
+        level: 'error',
+        message,
+        context: MonstersService.name,
+        method: 'battle',
+        metadata: { characterId, monsterId },
+      })
+      throw new NotFoundException(message)
     }
 
     const stats = await manager.findOne(StatsEntity, {
       where: { characterId },
     })
+    // 캐릭터의 스탯을 찾을 수 없는 경우
     if (!stats) {
-      throw new NotFoundException(`Stats for character ${characterId} not found`)
+      const message = `Stats for character ${characterId} not found`
+      await this.errorLogService.create({
+        level: 'error',
+        message,
+        context: MonstersService.name,
+        method: 'battle',
+        metadata: { characterId, monsterId },
+      })
+      throw new NotFoundException(message)
     }
 
     // 몬스터 조회
     const monster = await manager.findOne(MonstersEntity, {
       where: { monsterId },
     })
+    // 몬스터를 찾을 수 없는 경우
     if (!monster) {
-      throw new NotFoundException(`Monster with ID ${monsterId} not found`)
+      const message = `Monster with ID ${monsterId} not found`
+      await this.errorLogService.create({
+        level: 'error',
+        message,
+        context: MonstersService.name,
+        method: 'battle',
+        metadata: { characterId, monsterId },
+      })
+      throw new NotFoundException(message)
     }
 
     // 전투 시작

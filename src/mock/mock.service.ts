@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMockDto } from './dto/create-mock.dto';
-import { UpdateMockDto } from './dto/update-mock.dto';
+import { CreateMockDto } from 'src/dtos/create-mock.dto'
+import { UpdateMockDto } from 'src/dtos/update-mock.dto'
 
 @Injectable()
 export class MockService {

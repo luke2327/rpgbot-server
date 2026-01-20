@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { WebClient } from '@slack/web-api'
-import { JoinUserDTO } from './dtos/joinUserDto'
+import { JoinUserDto } from './dtos/join-user.dto'
 import { env } from './configs/env'
 import { kakaoTemplate } from './libs/kakao.utils'
 import { SlackService } from './slack/slack.service'
@@ -149,7 +149,7 @@ export class AppService {
     )
   }
 
-  async postJoinUser(joinUserDTO: JoinUserDTO) {
+  async postJoinUser(joinUserDTO: JoinUserDto) {
     const web = new WebClient(env.SLACK_TOKEN)
 
     const testObj = {
