@@ -1,4 +1,4 @@
-export class JoinUserDTO {
+export class JoinUserDto {
   badge: string
   channel: string
 }
