@@ -191,8 +191,7 @@ export class MonstersController {
 
   // 몬스터 정보 조회 블록 ID
   private getMonsterInfoBlockId(): string {
-    // TODO: 카카오톡에서 "몬스터 정보 표시" 블록 생성 후 여기에 블록 ID 입력
-    return 'MONSTER_INFO_BLOCK_ID' // 예: '6964xxxxxxxxxxxx'
+    return '6964dcccbe039a045f403a16'
   }
 
   // 전투 블록 ID
