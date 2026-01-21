@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { UserEntity } from 'src/entities/user.entity'
 import { SaveUserDto } from 'src/dtos/save-user.dto'
 import { CharactersEntity } from 'src/entities/characters.entity'
@@ -35,8 +36,9 @@ export class UserService {
     const { job, sex } = body.action.clientExtra
 
     await this.dataSource.transaction(async (manager) => {
-      // 유저 생성
+      // 유저 생성 (UUID 수동 생성 필요 - PrimaryColumn 사용)
       const user = manager.create(UserEntity, {
+        userId: uuidv4(),
         kakaoUserId,
       })
       await manager.save(user)
