@@ -228,7 +228,7 @@ export class MonstersController {
 
   // 몬스터 정보 조회 블록 ID
   private getMonsterInfoBlockId(): string {
-    return '6964dcccbe039a045f403a16'
+    return '6964dca13afd53471426be51'
   }
 
   // 전투 블록 ID
