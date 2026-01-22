@@ -197,7 +197,7 @@ export class MonstersController {
             {
               action: 'block',
               label: '더 들어가기',
-              blockId: this.getMonsterInfoBlockId(), // 몬스터 정보 조회 블록으로 이동
+              blockId: '6964dca13afd53471426be51',
               extra: {
                 monster_id: nextMonsterId.toString(),
               },
