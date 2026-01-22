@@ -195,7 +195,7 @@ export class MonstersController {
             {
               action: 'block',
               label: '더 들어가기',
-              blockId: '6964dcccbe039a045f403a16',
+              blockId: '6964dca13afd53471426be51',
             },
             {
               action: 'block',
