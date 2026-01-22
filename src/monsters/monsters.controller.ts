@@ -186,10 +186,8 @@ export class MonstersController {
       // 전투 과정을 텍스트로 변환
       const battleLog = this.formatBattleLog(battleResult)
 
-      // 승리 시 다음 몬스터로 이동하는 버튼 추가
+      // 승리 시 더 들어가기 버튼 추가
       if (battleResult.victory) {
-        const nextMonsterId = monsterId + 1
-
         return kakaoTemplate.textCard({
           title: '⚔️ 전투 결과',
           description: battleLog,
@@ -197,10 +195,7 @@ export class MonstersController {
             {
               action: 'block',
               label: '더 들어가기',
-              blockId: this.getMonsterInfoBlockId(), // 몬스터 정보 조회 블록으로 이동
-              extra: {
-                monster_id: nextMonsterId.toString(),
-              },
+              blockId: '6964dca13afd53471426be51',
             },
             {
               action: 'block',
