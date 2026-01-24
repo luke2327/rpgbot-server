@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
+import { Cron, CronExpression } from '@nestjs/schedule'
 import { v4 as uuidv4 } from 'uuid'
 import { UserEntity } from 'src/entities/user.entity'
 import { SaveUserDto } from 'src/dtos/save-user.dto'
@@ -83,5 +84,32 @@ export class UserService {
     })
 
     return kakaoTemplate.simpleText('유저 저장 완료')
+  }
+
+  // 매일 00시에 모든 캐릭터의 HP를 max로 복구
+  @Cron('0 0 * * *', {
+    timeZone: 'Asia/Seoul',
+  })
+  async resetAllCharactersHp() {
+    try {
+      // HP를 hp_max로 복구하는 쿼리
+      const result = await this.dataSource.query(`
+        UPDATE stats
+        SET hp_current = hp_max
+        WHERE hp_current < hp_max
+      `)
+
+      const updatedCount = result.affectedRows || 0
+
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `🌅 [자동 HP 복구]\n${updatedCount}명의 캐릭터 HP가 복구되었습니다.`,
+      })
+    } catch (error) {
+      await this.slackService.web.chat.postMessage({
+        channel: slackChannel.botTest,
+        text: `❌ [HP 복구 실패]\n${error.message}`,
+      })
+    }
   }
 }

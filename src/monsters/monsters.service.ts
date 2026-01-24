@@ -199,6 +199,14 @@ export class MonstersService {
       character.exp += monster.exp
       character.gold += monster.exp * 2 // 골드는 경험치의 2배
 
+      // 레벨업 체크: exp가 100 이상이면 레벨업
+      let leveledUp = false
+      if (character.exp >= 100) {
+        character.level += 1
+        character.exp = 0
+        leveledUp = true
+      }
+
       // 캐릭터 HP 업데이트
       stats.hpCurrent = characterHp
 
@@ -217,6 +225,40 @@ export class MonstersService {
       }
 
       // Slack 메시지 전송 (승리)
+      const slackFields: any[] = [
+        {
+          type: 'mrkdwn',
+          text: `*몬스터:* ${monster.name}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*캐릭터 ID:* ${characterId}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*획득 경험치:* ${monster.exp}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*획득 골드:* ${monster.exp * 2}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*남은 HP:* ${characterHp}`,
+        },
+        {
+          type: 'mrkdwn',
+          text: `*총 턴 수:* ${turns.length}`,
+        },
+      ]
+
+      if (leveledUp) {
+        slackFields.push({
+          type: 'mrkdwn',
+          text: `*🎊 레벨업!:* ${character.level - 1} → ${character.level}`,
+        })
+      }
+
       await this.slackService.web.chat.postMessage({
         channel: slackChannel.botTest,
         blocks: [
@@ -224,37 +266,12 @@ export class MonstersService {
             type: 'header',
             text: {
               type: 'plain_text',
-              text: '🎉 전투 승리!',
+              text: leveledUp ? '🎉 전투 승리 & 레벨업!' : '🎉 전투 승리!',
             },
           },
           {
             type: 'section',
-            fields: [
-              {
-                type: 'mrkdwn',
-                text: `*몬스터:* ${monster.name}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*캐릭터 ID:* ${characterId}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*획득 경험치:* ${monster.exp}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*획득 골드:* ${monster.exp * 2}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*남은 HP:* ${characterHp}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*총 턴 수:* ${turns.length}`,
-              },
-            ],
+            fields: slackFields,
           },
           {
             type: 'section',
